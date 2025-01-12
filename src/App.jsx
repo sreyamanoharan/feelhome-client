@@ -18,7 +18,7 @@ import Check from "./pages/check";
 // import HomeData from './components/userComponents/homeComponents/homeData'
 import AllProperties from "./pages/userPages/mainPages/allProperties";
 import PropertyDetails from "./pages/userPages/mainPages/PropertyDetails";
-import PaymentDetails from "./components/userComponents/mainComponents/paymentDetails";
+import PaymentDetails from "./components/userComponents/mainComponents/PaymentDetails";
 // import MainBanner from './components/adminComponents/BannerComponents/MainBanner'
 import AdminRoute from './routes/AdminRoutes'
 import HostRoute from './routes/HostRoutes'
