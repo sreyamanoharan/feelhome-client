@@ -173,7 +173,7 @@ function UserLogin() {
         <div className='mt-3'>
 
   
-        <GoogleOAuthProvider  clientId="420273489598-js0b4su7kbha7qsi8idqf2j08le5oh3f.apps.googleusercontent.com" >
+        <GoogleOAuthProvider  clientId="161297492569-lrbkhcpraa639qn64m7eav401ethrh55.apps.googleusercontent.com" >
                         <GoogleLogin
                           size="medium"
                           type="standard" 
