@@ -109,7 +109,7 @@ const PropertyDetail = () => {
 
 
     if (calculateDays() === 0) {
-      alert('Please select valid dates.');
+      toast.error('Please select valid dates.');
       return;
     } else {
       try {
