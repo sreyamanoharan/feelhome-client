@@ -261,7 +261,7 @@ const PropertyDetail = () => {
                   <p className="text-2xl" style={{ fontFamily: '"Dancing Script", serif' }}>What this place offers to you</p>
 
                   <div className="card-actions">
-                    <ul className="grid grid-cols-2 gap-4 font-bold text-lg" style={{ fontFamily: '"Dancing Script", serif' }}>
+                    <ul className="grid grid-cols-2 font-bold text-lg" style={{ fontFamily: '"Dancing Script", serif' }}>
                       {datas?.selectedFeatures?.map((amen, index) => (
                         <li key={index} className="flex items-center">
                           <IoMdArrowDropright className="text-lg" />
