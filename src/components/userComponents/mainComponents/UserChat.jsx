@@ -126,7 +126,7 @@ console.log(hostId,'hooossstttIiiidddd');
   return (
     <>
     <div className="h-900px pt-20">      
-{chats.length>0?(     <div className="min-w-full border rounded lg:grid lg:grid-cols-3 bg-white text-gray-900">
+ <div className="min-w-full border rounded lg:grid lg:grid-cols-3 bg-white text-gray-900">
         <div className="border-r border-gray-300 lg:col-span-1">
           <div className="overflow-auto">
             <div>
@@ -231,7 +231,7 @@ console.log(hostId,'hooossstttIiiidddd');
             </div>
           </div>
         </div>
-        </div>):(<p className='text-2xl mt-20 text-center'>No chats yet</p>)}
+        </div>
  
       </div>
    
