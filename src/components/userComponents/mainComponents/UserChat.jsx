@@ -16,7 +16,7 @@ const UserChat = ({ role }) => {
   const scrolldownRef = useRef(null);
   const userId = useSelector((state) => state.User.userId);
 
-  let socket = io('http://localhost:3000/');
+  let socket = io('https://feelhome.site/');
   let roles=role
 
 const hostid=useParams()
