@@ -174,6 +174,7 @@ function UserLogin() {
                   type="standard"
                   theme="outline"
                   onSuccess={googleSignup}
+                  redirect_uri="https://feelhome-client.vercel.app"
                   onError={() => toast.error('Google login failed. Please try again.')}
                 />
               </div>
