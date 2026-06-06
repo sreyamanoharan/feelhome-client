@@ -1,94 +1,76 @@
-import React,  { useEffect ,useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import axiosInstance from '../../api/axios'
-import {useNavigate} from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux';
-import { addSelectedFeature } from '../../store/slice/Host';
-import HostNavbar from './HostNavbar';
-
+import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { addSelectedFeature } from '../../store/slice/Host'
+import HostNavbar from './HostNavbar'
 
 const HostAmenities = () => {
+  const [feature, setFeature] = useState([]);
+  const navigate = useNavigate();
+  const [selected, setSelected] = useState([]);
+  const dispatch = useDispatch();
 
-      const [feature,setFeature]=useState([])
-      const navigate=useNavigate()
-      const [selectedFeature,setSelectedFeature]=useState([])
-      const [selected, setSelected] = useState([])
-      const dispatch=useDispatch()
-      
+  const manageSelected = (feat) => {
+    if (selected.includes(feat)) {
+      setSelected(selected.filter(item => item !== feat));
+    } else {
+      setSelected([...selected, feat]);
+    }
+  };
 
-      const manageSelected = (feature) => {
-        if(selected.includes(feature)){
-          setSelected(selected.filter(item => item!=feature))
-        }else{
-          setSelected([...selected, feature])
-        }
-      }
+  useEffect(() => {
+    axiosInstance.get('/getFeature').then((res) => {
+      setFeature(res.data.feature);
+    }).catch(err => console.log(err));
+  }, []);
 
-      useEffect(()=>{
-         axiosInstance.get('/getFeature').then((res)=>{
-          setFeature(res.data.feature)
-         }).catch(err=>{
-          console.log(err);
-         })
-      },[])
+  const handleSubmit = () => {
+    selected.forEach(item => dispatch(addSelectedFeature({ selectedFeature: item })));
+    navigate('/host/hostPhotos');
+  };
 
-      const handleSubmit = () => {
-        console.log('amen');
-        
-        selected.forEach(item => {
-          dispatch(addSelectedFeature({selectedFeature:item}))
-        })
-        navigate('/host/hostPhotos')
-      }
-
-      
   return (
-    <>
-    <HostNavbar/>
-    <div className='bg-white h-screen w-full flex flex-col justify-center items-center' style={{fontFamily:' "Roboto Slab", serif'}}>
+    <div className="min-h-screen bg-gray-50 flex flex-col" style={{ fontFamily: '"Roboto Slab", serif' }}>
+      <HostNavbar />
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-24">
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 w-full max-w-2xl p-8 md:p-10">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: '"Roboto Slab", serif' }}>
+            What does your place offer?
+          </h1>
+          <p className="text-gray-500 text-sm leading-relaxed mb-8">
+            Select all the amenities available at your property. You can update these anytime.
+          </p>
 
-    <div className='text-center'>
-     
-      <h1 className='text-gray-900 mt-3 text-3xl'>Which of these best describes your place</h1>
-      <div>
-      <div className="flex">
-
-      {feature.map((feature, index)=>(
-        <div
-                  key={feature.id}
-                  className={`${selected.includes(feature) && `bg-gray-400`} w-1/3 p-4 border text-center mt-6 ${
-                    selectedFeature === feature ? 'selected-feature' : ''
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {feature.map((feat, index) => {
+              const isSelected = selected.includes(feat);
+              return (
+                <div
+                  key={feat.id || index}
+                  className={`relative border-2 rounded-2xl p-4 cursor-pointer transition-all flex flex-col items-center gap-2 text-sm font-medium ${
+                    isSelected ? 'border-blue-900 bg-blue-50 text-blue-900' : 'border-gray-200 hover:border-gray-300 text-gray-700'
                   }`}
-                  onClick={() => { manageSelected(feature);  }} 
+                  onClick={() => manageSelected(feat)}
                 >
-                  {selectedFeature=== feature && (
-                    <div className="selected-tick">✔</div> 
+                  {isSelected && (
+                    <div className="absolute top-2 right-2 w-5 h-5 bg-blue-900 rounded-full flex items-center justify-center text-white text-xs font-bold">✓</div>
                   )}
-                  <div className="text-3xl text-gray-900">
-                    <img src={feature.featureImage} alt={feature.heading} />
-                  </div>
-                  <div className="text-gray-900">{feature.heading}</div>
+                  <img src={feat.featureImage} alt={feat.heading} className="w-12 h-12 object-contain" />
+                  <span>{feat.heading}</span>
                 </div>
-      ))}
-      
- 
-   
-  </div>
+              );
+            })}
+          </div>
 
+          <div className="flex justify-between mt-8">
+            <button onClick={() => navigate(-1)} className="px-6 py-2.5 border border-gray-200 rounded-xl text-gray-700 font-semibold text-sm hover:bg-gray-50 transition-all">Back</button>
+            <button onClick={handleSubmit} className="px-6 py-2.5 bg-blue-900 hover:bg-blue-800 text-white font-semibold rounded-xl text-sm transition-all shadow">Next</button>
+          </div>
+        </div>
+      </div>
     </div>
-    </div>
-   
-    <div className="bg-gray-900 w-full mt-16 relative">
-    <div className="h-px w-30/100 bg-gray-900"></div>
-    <div className="h-px w-70/100 bg-gray-900"></div>
-    </div>
-  
-    <div className='mt-12 flex  gap-16'>
-    <button onClick={()=>navigate(-1)} className='bg-gray-900 text-white px-4 py-2'>Back</button>
-    <button onClick={handleSubmit} className='bg-gray-900 text-white px-4 py-2'>Next</button>
-    </div>
-    </div>
-    </>
-  )
-}
+  );
+};
 
-export default HostAmenities
+export default HostAmenities;

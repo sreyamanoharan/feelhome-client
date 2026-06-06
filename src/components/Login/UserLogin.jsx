@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import axiosInstance from '../../api/axios'
 import { useDispatch } from 'react-redux'
 import { userLogin } from '../../../src/store/slice/User'
-import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
+import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
 
 
@@ -13,7 +13,7 @@ function UserLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [reMail, setRemail] = useState(false);
-  const [forgott, setForgott] = useState(false)
+  // const [forgott, setForgott] = useState(false)//
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -68,53 +68,38 @@ function UserLogin() {
   }
 
   const googleSignup = async (credentialResponse) => {
-    console.log("hi");
-
     const { credential } = credentialResponse;
-    console.log(credential);
-
-    console.log(credential);
 
     if (credential) {
       try {
         const decode = jwtDecode(credential);
-        console.log(decode);
-
         const Guser = {
           name: decode.name,
-          email: decode.email,
-          password: decode.email.split("@")[0]
+          email: decode.email
         };
-        console.log("Guser", Guser);
 
         const { data } = await axiosInstance.post("/userGlogin", {
           ...Guser,
 
         });
-        console.log(data);
-
         if (data) {
-          console.log(data);
-          const name = data.username
-          const GsignCheck = data.email;
+          const name = data.name
           const token = data.token;
           const role = data.role
           const userId = data.userId
           dispatch(userLogin({ name, token, role, userId }))
 
 
-          localStorage.setItem(
-            "user",
-            JSON.stringify(token, GsignCheck)
-          );
+          toast.success(data.message || "Google login successful");
           navigate("/");
         }
 
       } catch (error) {
         console.error("Error in googleSignup:", error);
+        toast.error(error?.response?.data?.errmsg || "Google login failed. Please try again.");
       }
     } else {
-      console.error("Credential is null");
+      toast.error("Google login failed. Please try again.");
     }
   };
 
@@ -124,79 +109,85 @@ function UserLogin() {
       <Toaster toastOptions={{ duration: 3000 }} />
 
       <div>
-
-        <div className="min-h-screen flex items-center justify-center bg-cover bg-center" style={{ backgroundImage: "url('/static/image/homestay.jpg')" }}>
-          <div className="relative flex flex-col justify-center min-h-screen overflow-hidden ">
-            <div className=" p-6 m-auto bg-white rounded-md shadow-md w-[100%] md:w-96 ">
-              <h1 className="text-3xl font-semibold text-center text-purple-700 underline">
-                Log in
+        <div className="min-h-screen flex items-center justify-center bg-cover bg-center relative" style={{ backgroundImage: "url('/static/image/homestay.jpg')" }}>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[3px]"></div>
+          <div className="relative flex flex-col justify-center min-h-screen overflow-hidden z-10 w-full items-center px-4">
+            <div className="p-8 m-auto bg-white rounded-2xl shadow-2xl border border-gray-100 w-full max-w-md md:w-96 animate-scale-up">
+              <h1 className="text-3xl font-bold text-center text-purple-800 tracking-tight">
+                Welcome Back
               </h1>
-              <form className="mt-6" onSubmit={handleLogin}>
-                <div className="mb-2">
+              <p className="text-center text-gray-500 text-sm mt-1 mb-6">Log in to manage your homestay</p>
+              
+              <form className="space-y-4" onSubmit={handleLogin}>
+                <div>
                   <label
                     form="email"
-                    className="block text-sm font-semibold text-gray-800"
+                    className="block text-sm font-semibold text-gray-700"
                   >
-                    Email
+                    Email Address
                   </label>
                   <input
                     onChange={(e) => setEmail(e.target.value)}
                     type="email"
-                    className="block w-full px-4 py-2 mt-2 text-purple-700 bg-white border rounded-md focus:border-purple-400 focus:ring-purple-300 focus:outline-none focus:ring focus:ring-opacity-40"
+                    className="block w-full px-4 py-2.5 mt-1.5 text-gray-900 bg-white border border-gray-300 rounded-xl focus:border-purple-500 focus:ring-4 focus:ring-purple-100 focus:outline-none transition-all duration-300 shadow-sm"
+                    placeholder="you@example.com"
                   />
                 </div>
-                <div className="mb-2">
+                <div>
                   <label
                     form="password"
-                    className="block text-sm font-semibold text-gray-800"
+                    className="block text-sm font-semibold text-gray-700"
                   >
                     Password
                   </label>
                   <input
                     onChange={(e) => setPassword(e.target.value)}
                     type="password"
-                    className="block w-full px-4 py-2 mt-2 text-purple-700 bg-white border rounded-md focus:border-purple-400 focus:ring-purple-300 focus:outline-none focus:ring focus:ring-opacity-40"
+                    className="block w-full px-4 py-2.5 mt-1.5 text-gray-900 bg-white border border-gray-300 rounded-xl focus:border-purple-500 focus:ring-4 focus:ring-purple-100 focus:outline-none transition-all duration-300 shadow-sm"
+                    placeholder="••••••••"
                   />
                 </div>
-                <a
-                  onClick={() => forgotPassword()}
-                  className="text-xs text-purple-600 hover:underline cursor-pointer"
-                >
-                  Forget Password?
-                </a>
-                <div className="mt-6">
-                  <button className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-purple-700 rounded-md hover:bg-purple-600 focus:outline-none focus:bg-purple-600">
+                <div className="flex justify-end">
+                  <a
+                    onClick={() => forgotPassword()}
+                    className="text-xs font-medium text-purple-600 hover:text-purple-700 hover:underline cursor-pointer transition-colors duration-200"
+                  >
+                    Forgot Password?
+                  </a>
+                </div>
+                <div className="pt-2">
+                  <button className="w-full px-4 py-3 text-white font-semibold transition-all duration-300 bg-gradient-to-r from-purple-700 to-purple-600 rounded-xl hover:from-purple-600 hover:to-purple-500 active:scale-[0.98] shadow-lg hover:shadow-purple-500/20">
                     Login
                   </button>
                 </div>
               </form>
-              <div className='mt-3'>
 
-
-                <GoogleOAuthProvider clientId="161297492569-lrbkhcpraa639qn64m7eav401ethrh55.apps.googleusercontent.com" >
-                  <GoogleLogin
-                    size="medium"
-                    type="standard"
-                    theme="outline"
-                    onSuccess={googleSignup}
-                    onError={() => {
-                    }}
-
-                  />
-                </GoogleOAuthProvider>
+              <div className="relative flex py-4 items-center">
+                <div className="flex-grow border-t border-gray-200"></div>
+                <span className="flex-shrink mx-4 text-gray-400 text-xs font-medium uppercase">Or continue with</span>
+                <div className="flex-grow border-t border-gray-200"></div>
               </div>
-              <p className="mt-8 text-xs font-light text-center text-gray-700">
-                {" "}
+
+              <div className='flex justify-center mt-1'>
+                <GoogleLogin
+                  size="large"
+                  type="standard"
+                  theme="outline"
+                  onSuccess={googleSignup}
+                  onError={() => toast.error('Google login failed. Please try again.')}
+                />
+              </div>
+
+              <p className="mt-8 text-sm font-normal text-center text-gray-600">
                 Don't have an account?{" "}
                 <a
                   href="/register"
-                  className="font-medium text-purple-600 hover:underline"
+                  className="font-semibold text-purple-600 hover:text-purple-700 hover:underline transition-colors duration-200"
                 >
                   Sign up
                 </a>
               </p>
             </div>
-
           </div>
         </div>
       </div>

@@ -10,176 +10,166 @@ const HostPhotos = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [uploadedImages, setUploadedImages] = useState([]);
-  const [errorMessage, setErrorMessage] = useState(''); // State for error message
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleImageUpload = (e) => {
     const files = e.target.files;
     const fileArray = Array.from(files);
     setUploadedImages(fileArray);
-    setErrorMessage(''); // Clear error message when new files are added
-  };
-
-  const reduxImage = (imageArray) => {
-    const imageStrings = imageArray.map((image) => {
-      URL.createObjectURL(image);
-    });
-
-    dispatch(addImage({ images: imageStrings }));
+    setErrorMessage('');
+    setIsSubmitted(false);
   };
 
   const handleImageSubmit = async () => {
     if (uploadedImages.length < 5) {
-      setErrorMessage('Please upload at least 5 images.'); // Show error if fewer than 5 images
+      setErrorMessage('Please upload at least 5 images.');
       return;
     }
 
-    console.log("Submitting images...");
-    return new Promise((resolve, reject) => {
-      if (uploadedImages.length === 0) {
-        resolve(true);
-      }
+    setIsUploading(true);
+    setErrorMessage('');
 
-      uploadedImages.map(async (file, index) => {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', 'feelhomeimage');
-        const result = await axios.post(
-          'https://api.cloudinary.com/v1_1/ds0dvm4ol/image/upload?upload_preset=feelHome',
-          formData
-        );
-        console.log(result.data.secure_url);
-        dispatch(addImage({ images: result.data.secure_url }));
-        if (uploadedImages.length === index + 1) {
-          setUploadedImages([]);
-          resolve(true);
-        }
-      });
-    });
+    try {
+      await Promise.all(
+        uploadedImages.map(async (file) => {
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('upload_preset', 'feelHome');
+          const result = await axios.post(
+            'https://api.cloudinary.com/v1_1/ds0dvm4ol/image/upload?upload_preset=feelHome',
+            formData
+          );
+          dispatch(addImage({ images: result.data.secure_url }));
+        })
+      );
+
+      setUploadedImages([]);
+      setIsSubmitted(true);
+    } catch (error) {
+      console.error('Image upload failed:', error);
+      setErrorMessage('Failed to upload images. Please try again.');
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
-    <>
-    <HostNavbar/>
-      <div
-        className='bg-white h-screen w-full flex flex-col justify-center items-center'
-        style={{ fontFamily: '"Roboto Slab", serif' }}
-      >
-        <h1 className='text-gray-900 mt-3 text-3xl leading-loose'>
-          Add Some photos of your Property
-        </h1>
-        <div>
-          <input type="file" multiple onChange={handleImageUpload} />
-          {errorMessage && (
-            <p className="text-red-500 mt-2">{errorMessage}</p>
+    <div className="min-h-screen bg-gray-50 flex flex-col" style={{ fontFamily: '"Roboto Slab", serif' }}>
+      <HostNavbar />
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-24">
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 w-full max-w-2xl p-8 md:p-10">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: '"Roboto Slab", serif' }}>
+            Add some photos of your property
+          </h1>
+          <p className="text-gray-500 text-sm leading-relaxed mb-8">
+            Upload at least 5 photos. Great photos help guests imagine staying at your place.
+          </p>
+
+          {/* Upload area — hide while uploading or after submitted */}
+          {!isUploading && !isSubmitted && (
+            <label className="block border-2 border-dashed border-gray-300 hover:border-blue-400 rounded-2xl p-8 text-center cursor-pointer transition-all">
+              <div className="text-4xl mb-2">📷</div>
+              <p className="text-gray-500 text-sm font-medium">Click to upload photos</p>
+              <p className="text-gray-400 text-xs mt-1">JPG, PNG, WEBP supported</p>
+              <input
+                type="file"
+                multiple
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+            </label>
           )}
-          {/* Display redux images with previews */}
-          <div style={{ display: 'flex', marginTop: '10px' }}>
-            {hostData.images &&
-              hostData.images.map((imageName, index) => (
-                <div key={index} style={{ marginRight: '10px' }}>
+
+          {errorMessage && (
+            <p className="text-red-500 text-sm mt-3">{errorMessage}</p>
+          )}
+
+          {/* Loader */}
+          {isUploading && (
+            <div className="flex flex-col items-center justify-center py-10 gap-3">
+              <div className="w-10 h-10 border-4 border-blue-900 border-t-transparent rounded-full animate-spin"></div>
+              <p className="text-sm text-gray-500 font-medium">Uploading your photos, please wait...</p>
+            </div>
+          )}
+
+          {/* Local preview before submit */}
+          {!isUploading && uploadedImages.length > 0 && (
+            <div className="grid grid-cols-4 gap-2 mt-4">
+              {uploadedImages.map((image, index) => (
+                <div key={index} className="rounded-lg overflow-hidden h-20">
                   <img
-                    src={`${imageName}`}
+                    src={URL.createObjectURL(image)}
                     alt={`uploaded-${index}`}
-                    style={{
-                      width: '100px',
-                      height: '100px',
-                      objectFit: 'cover',
-                    }}
+                    className="w-full h-full object-cover"
                   />
                 </div>
               ))}
-          </div>
+            </div>
+          )}
 
-          {/* Display uploaded images with previews */}
-          <div style={{ display: 'flex', marginTop: '10px' }}>
-            {uploadedImages.map((image, index) => (
-              <div key={index} style={{ marginRight: '10px' }}>
-                <img
-                  src={URL.createObjectURL(image)}
-                  alt={`uploaded-${index}`}
-                  style={{
-                    width: '100px',
-                    height: '100px',
-                    objectFit: 'cover',
-                  }}
-                />
-                <p>state</p>
-              </div>
-            ))}
-          </div>
+          {/* Cloudinary uploaded previews */}
+          {!isUploading && hostData.images && hostData.images.length > 0 && (
+            <div className="grid grid-cols-4 gap-2 mt-4">
+              {hostData.images.map((imageName, index) => (
+                <div key={index} className="rounded-lg overflow-hidden h-20">
+                  <img
+                    src={`${imageName}`}
+                    alt={`saved-${index}`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
 
-          <button
-            className='bg-gray-900 p-2 text-white'
-            onClick={async () => await handleImageSubmit()}
-          >
-            Submit Images
-          </button>
-        </div>
-        <div className='mt-12 flex gap-14'>
-          <button
-            onClick={() => navigate(-1)}
-            className='bg-gray-900 text-white px-4 py-2'
-          >
-            Back
-          </button>
-          <button
-            onClick={() => navigate('/host/hostFinish')}
-            className='bg-gray-900 text-white px-4 py-2'
-          >
-            Next
-          </button>
+          {/* Success message after upload */}
+          {isSubmitted && (
+            <div className="flex items-center gap-2 mt-4 bg-green-50 border border-green-200 rounded-xl px-4 py-3">
+              <span className="text-green-500 text-lg">✅</span>
+              <p className="text-green-700 text-sm font-medium">
+                Photos uploaded successfully! You can proceed to next step.
+              </p>
+            </div>
+          )}
+
+          {/* Submit button — hide after submitted or while uploading */}
+          {!isSubmitted && !isUploading && (
+            <div className="flex gap-3 justify-end mt-4">
+              <button
+                className="px-4 py-2 border border-blue-900 text-blue-900 text-sm rounded-xl hover:bg-blue-50 transition-all disabled:opacity-50"
+                onClick={handleImageSubmit}
+                disabled={uploadedImages.length === 0}
+              >
+                Submit Images
+              </button>
+            </div>
+          )}
+
+          <div className="flex justify-between mt-8">
+            <button
+              onClick={() => navigate(-1)}
+              className="px-6 py-2.5 border border-gray-200 rounded-xl text-gray-700 font-semibold text-sm hover:bg-gray-50 transition-all"
+            >
+              Back
+            </button>
+            <button
+              onClick={() => navigate('/host/hostFinish')}
+              disabled={!isSubmitted}
+              className={`px-6 py-2.5 text-white font-semibold rounded-xl text-sm transition-all shadow
+                ${isSubmitted 
+                  ? 'bg-blue-900 hover:bg-blue-800 cursor-pointer' 
+                  : 'bg-gray-300 cursor-not-allowed'
+                }`}
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
 export default HostPhotos;
-
-        {/* <div className='bg-white h-screen w-full flex flex-col justify-center items-center'>
-    
-          <div className='text-center'>
-    
-            <h1 className='text-gray-900 mt-3 text-3xl'>Add some photos</h1>
-            <div className="border border-gray-300 rounded p-4 mt-6 mb-7 ">
-              <div className='flex justify-center '>
-                <div>
-    
-                  <label
-                    htmlFor="file-input"
-                    className="photo-upload-button relative inline-block cursor-pointer mt-6 mb-8 ml-8 mr-8"
-                  >
-                    <div className="add-photo-icon w-40 h-40 bg-gray-300 text-gray-600 flex justify-center items-center text-4xl">
-                      +
-                    </div>
-    
-                    <input
-                      type="file"
-                      id="file-input"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const selectedImages = e.target.files
-                        const imageArray = Array.from(selectedImages)
-                        reduxImage(imageArray)
-                      }}
-                      className="hidden"
-                    />
-    
-                  </label>
-                </div>
-              </div>
-            </div>
-    
-    
-    
-          </div>
-    
-          <div className="bg-gray-900 w-full mt-16 relative">
-            <div className="h-px w-30/100 bg-gray-900"></div>
-            <div className="h-px w-70/100 bg-gray-900"></div>
-          </div>
-    
-          <div className='mt-12'>
-            <a onClick={()=>navigate('/hostFinish')} className='bg-gray-900 text-white px-4 py-2'>Next</a>
-          </div>
-        </div> */}

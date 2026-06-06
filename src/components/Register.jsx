@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import axios  from 'axios';
+import axios from 'axios';
 import axiosInstance from '../api/axios'
 import { Navigate } from 'react-router-dom'
 import { Toaster, toast } from 'react-hot-toast'
@@ -8,12 +8,12 @@ import { Toaster, toast } from 'react-hot-toast'
 
 const Register = () => {
 
-  
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [PhoneNumber, setPhoneNumber] = useState('')
   const [password, setPassword] = useState('')
-  const [ConfirmPassword, setConfirmPassword] = useState('')  
+  const [ConfirmPassword, setConfirmPassword] = useState('')
   const [Err, setErr] = useState(null)
 
   const regex_password = /^(?=.*?[A-Z])(?=.*[a-z])(?=.*[0-9]){8,16}/
@@ -31,39 +31,37 @@ const Register = () => {
 
   const handleSubmit = async () => {
 
-
     try {
-      await axiosInstance.post('/register', { name, email, PhoneNumber, password }).then((res)=>{
+      await axiosInstance.post('/register', { name, email, PhoneNumber, password }).then((res) => {
+        console.log(res, 'ressss');
 
-      
         if (res.data.message) {
           toast.success(res.data.message);
-          clearForm ()
+          clearForm()
         }
-      }).catch((err)=>{
-        if(err.response.status===404){
+      }).catch((err) => {
+        if (err.response.status === 404) {
           Navigate('/serverError')
-        }else if(err?.response?.data){
+        } else if (err?.response?.data) {
           toast.error(err?.response?.data?.message)
         }
       })
 
 
     } catch (error) {
-      console.error('Error:',error.message)
+      console.error('Error:', error.message)
     }
   };
 
 
   function singUp(e) {
     e.preventDefault()
-
     if (name.trim().length == 0 || email.trim().length == 0 || PhoneNumber.trim().length == 0 || password.trim().length == 0 || ConfirmPassword.trim().length == 0) {
       setErr('fill all the fields')
     } else {
-      if(!nameRegex.test(name)){
+      if (!nameRegex.test(name)) {
         setErr('Invalid name format. Only letters are allowed.')
-      }else if (regex_mobile.test(PhoneNumber) == false) {
+      } else if (regex_mobile.test(PhoneNumber) == false) {
         setErr('wrong Mobile')
       } else if (regex_password.test(password) == false) {
         setErr('Use Strong password');
@@ -83,103 +81,108 @@ const Register = () => {
   return (
     <>
       <Toaster toastOptions={{ duration: 3000 }} />
-      <div className="min-h-screen flex items-center justify-center bg-cover bg-center" style={{ backgroundImage: "url('/static/image/homestay.jpg')" }}>
-        <div className="relative flex flex-col justify-center overflow-hidden ml-auto  w-1/3">
+      <div className="min-h-screen flex items-center justify-center bg-cover bg-center relative" style={{ backgroundImage: "url('/static/image/homestay.jpg')" }}>
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-[3px]"></div>
+        <div className="relative flex flex-col justify-center min-h-screen overflow-hidden z-10 w-full lg:w-[45%] lg:ml-auto items-center px-4 lg:pr-20">
 
-
-          <div className="w-full p-6 m-auto h bg-white rounded-md shadow-md lg:max-w-xl p-65">
-            <h1 className="text-3xl font-semibold text-center bg-opacity-75 text-red-500 underline">
-              Register
+          <div className="w-full max-w-md p-8 m-auto bg-white rounded-2xl shadow-2xl border border-gray-100 animate-scale-up">
+            <h1 className="text-3xl font-bold text-center text-red-500 tracking-tight">
+              Create Account
             </h1>
-            <form className="mt-6" onSubmit={singUp}>
-              <div className="mb-2">
+            <p className="text-center text-gray-500 text-sm mt-1 mb-6">Join FeelHome and explore stays</p>
+
+            <form className="space-y-4" onSubmit={singUp}>
+              <div>
                 <label
                   htmlFor="name"
-                  className="block text-sm font-semibold text-gray-800 text-opacity-200"
+                  className="block text-sm font-semibold text-gray-700"
                 >
-                  Name
+                  Full Name
                 </label>
                 <input
                   type="text"
                   value={name}
-                  className="block w-full px-4 py-2 mt-2 text-purple-700 bg-white border rounded-md focus:border-purple-400 focus:ring-purple-300 focus:outline-none focus:ring focus:ring-opacity-40"
+                  className="block w-full px-4 py-2 mt-1.5 text-gray-900 bg-white border border-gray-300 rounded-xl focus:border-red-400 focus:ring-4 focus:ring-red-100 focus:outline-none transition-all duration-300 shadow-sm"
                   onChange={(e) => setName(e.target.value)}
+                  placeholder="John Doe"
                 />
               </div>
-              <div className="mb-2">
+              <div>
                 <label
                   htmlFor="PhoneNumber"
-                  className="block text-sm font-semibold text-gray-800"
+                  className="block text-sm font-semibold text-gray-700"
                 >
                   Phone Number
                 </label>
                 <input
                   type="text"
-                   value={PhoneNumber}
-                  className="block w-full px-4 py-2 mt-2 text-purple-700 bg-white border rounded-md focus:border-purple-400 focus:ring-purple-300 focus:outline-none focus:ring focus:ring-opacity-40"
+                  value={PhoneNumber}
+                  className="block w-full px-4 py-2 mt-1.5 text-gray-900 bg-white border border-gray-300 rounded-xl focus:border-red-400 focus:ring-4 focus:ring-red-100 focus:outline-none transition-all duration-300 shadow-sm"
                   onChange={(e) => setPhoneNumber(e.target.value)}
+                  placeholder="10 digit number"
                 />
               </div>
-              <div className="mb-2">
+              <div>
                 <label
                   htmlFor="email"
-                  className="block text-sm font-semibold text-gray-800"
+                  className="block text-sm font-semibold text-gray-700"
                 >
-                  Email
+                  Email Address
                 </label>
                 <input
                   type="email"
                   value={email}
-                  className="block w-full px-4 py-2 mt-2 text-purple-700 bg-white border rounded-md focus:border-purple-400 focus:ring-purple-300 focus:outline-none focus:ring focus:ring-opacity-40"
+                  className="block w-full px-4 py-2 mt-1.5 text-gray-900 bg-white border border-gray-300 rounded-xl focus:border-red-400 focus:ring-4 focus:ring-red-100 focus:outline-none transition-all duration-300 shadow-sm"
                   onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
                 />
               </div>
-              <div className="mb-2">
+              <div>
                 <label
                   htmlFor="password"
-                  className="block text-sm font-semibold text-gray-800"
+                  className="block text-sm font-semibold text-gray-700"
                 >
                   Password
                 </label>
                 <input
                   type="password"
-                 value={password}
-                  className="block w-full px-4 py-2 mt-2 text-purple-700 bg-white border rounded-md focus:border-purple-400 focus:ring-purple-300 focus:outline-none focus:ring focus:ring-opacity-40"
+                  value={password}
+                  className="block w-full px-4 py-2 mt-1.5 text-gray-900 bg-white border border-gray-300 rounded-xl focus:border-red-400 focus:ring-4 focus:ring-red-100 focus:outline-none transition-all duration-300 shadow-sm"
                   onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
                 />
               </div>
-              <div className="mb-2">
+              <div>
                 <label
-                  htmlFor="password"
-                  className="block text-sm font-semibold text-gray-800"
+                  htmlFor="ConfirmPassword"
+                  className="block text-sm font-semibold text-gray-700"
                 >
-                  ConfirmPassword
+                  Confirm Password
                 </label>
                 <input
                   type="password"
                   value={ConfirmPassword}
-                  className="block w-full px-4 py-2 mt-2 text-purple-700 bg-white border rounded-md focus:border-purple-400 focus:ring-purple-300 focus:outline-none focus:ring focus:ring-opacity-40"
+                  className="block w-full px-4 py-2 mt-1.5 text-gray-900 bg-white border border-gray-300 rounded-xl focus:border-red-400 focus:ring-4 focus:ring-red-100 focus:outline-none transition-all duration-300 shadow-sm"
                   onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="••••••••"
                 />
+              </div>
 
+              <div className='flex justify-center text-center'>
+                <span className='text-red-500 text-xs font-medium'>{Err ? Err : 'Password should contain A-Z, a-z & 1-9'}</span>
               </div>
-          
-              <div className='flex justify-center'>
-                <span className='text-red-600 text-sm'>{Err ? Err : '[password should contain A-Z&a-z&1-9]'}</span>
-              </div>
-              <div className="mt-6">
-                <button type='submit' className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-red-500 rounded-md hover:bg-purple-600 focus:outline-none focus:bg-purple-600">
+              <div className="pt-2">
+                <button type='submit' className="w-full px-4 py-3 text-white font-semibold transition-all duration-300 bg-gradient-to-r from-red-500 to-rose-500 rounded-xl hover:from-red-600 hover:to-rose-600 active:scale-[0.98] shadow-lg hover:shadow-red-500/20">
                   Register
                 </button>
               </div>
             </form>
 
-            <p className="mt-8 text-xs font-light text-center text-gray-700 opacity-100">
-              {" "}
+            <p className="mt-8 text-sm font-normal text-center text-gray-600">
               Already have an account?{" "}
               <a
                 href="/userLogin"
-                className="font-medium text-purple-600 hover:underline opacity-100"
+                className="font-semibold text-red-500 hover:text-red-600 hover:underline transition-colors duration-200"
               >
                 Log in
               </a>
@@ -187,7 +190,7 @@ const Register = () => {
           </div>
         </div>
       </div>
-     
+
     </>
   );
 };

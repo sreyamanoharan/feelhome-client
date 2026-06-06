@@ -43,7 +43,7 @@ const baseURL = 'https://feelhome.site/'
 const axiosInstance = axios.create({
   baseURL: baseURL
 })
-axiosInstance.interceptors.request.use( 
+axiosInstance.interceptors.request.use(
   config => {
     let token
 
@@ -51,9 +51,9 @@ axiosInstance.interceptors.request.use(
 
     if (role === 'admin') {
       token = Store.getState().adminState?.token || null;
-    }else{
+    } else {
       token = Store.getState().User?.token || null;
-    }   
+    }
     if (token) {
       config.headers['authorization'] = `Bearer ${token}`;
     }

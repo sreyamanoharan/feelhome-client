@@ -1,101 +1,84 @@
-import React, { useEffect, useState } from 'react';
-import {useNavigate} from 'react-router-dom'
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../api/axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { addSelectedCategory } from '../../store/slice/Host';
-import { Toaster, toast } from 'react-hot-toast'
+import { Toaster, toast } from 'react-hot-toast';
 import HostNavbar from './HostNavbar';
 
-
 const HostType = () => {
-  const hostData = useSelector(state => state.Host)
-  console.log(hostData);
+  // const hostData = useSelector(state => state.Host);
   const [category, setCategory] = useState([]);
-  const navigate = useNavigate()
-  const [selectedCategory, setSelectedCategory] = useState(null); // To store selected category
-  const [selected, setSelected] = useState(null)
-  const [Err, setErr] = useState(null)
-  
+  const navigate = useNavigate();
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selected, setSelected] = useState(null);
   const dispatch = useDispatch();
 
-
-  
   const handleNextClick = () => {
     if (selected === null) {
-      toast.error('Please select a category before proceeding.'); // Display error message
+      toast.error('Please select a category before proceeding.');
       return;
     }
-
-      navigate("/host/hostLocation")
-  
+    navigate('/host/hostLocation');
   };
-  
-  const reduxCategory=(heading)=>{
-    dispatch(addSelectedCategory({selectedCategory:heading}))
-  }
 
+  const reduxCategory = (heading) => {
+    dispatch(addSelectedCategory({ selectedCategory: heading }));
+  };
 
   useEffect(() => {
-    axiosInstance
-      .get('/getCategory')
-      .then((res) => {
-        setCategory(res.data.category);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    axiosInstance.get('/getCategory').then((res) => {
+      setCategory(res.data.category);
+    }).catch((err) => console.log(err));
   }, []);
 
-
   return (
-    <>
-
+    <div className="min-h-screen bg-gray-50 flex flex-col" style={{ fontFamily: '"Roboto Slab", serif' }}>
       <Toaster toastOptions={{ duration: 3000 }} />
-     <HostNavbar/>
-      <div className="bg-white h-screen w-full flex flex-col justify-center items-center" style={{fontFamily:' "Roboto Slab", serif'}}>
-        <div className="text-center">
-          <h1 className="text-gray-900 mt-3 text-3xl">
-            Which of these best describes your place
+      <HostNavbar />
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-24">
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 w-full max-w-2xl p-8 md:p-10">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: '"Roboto Slab", serif' }}>
+            Which of these best describes your place?
           </h1>
-           
-          <div>
-            <div className="flex">
-              {category.map((type,index) => (
-                <div 
-                  key={index}
-                  className={`w-1/3 p-4 border rounded-lg mx-2 ${selected===index ? `bg-gray-400 text-white` : `text-black`} text-center mt-6 ${
-                    selectedCategory === type ? 'selected-category' : ''
-                  }`}
-                  onClick={() =>{ setSelected(index); reduxCategory(type.heading);  }} // Pass the selected category
-                >
-                   {selectedCategory === type && (
-                  <div className="selected-tick">✔</div> // Selected tick animation
-                   )}
-                  <div className="text-3xl ">
-                    <img src={type.categoryImage} alt={type.heading} />
-                  </div>
-                  <div className="">{type.heading}</div>
-                </div>
-              ))}
-              
-            </div>
+          <p className="text-gray-500 text-sm leading-relaxed mb-8">
+            Choose the category that best matches your property type.
+          </p>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {category.map((type, index) => (
+              <div
+                key={index}
+                className={`border-2 rounded-2xl p-4 cursor-pointer transition-all flex flex-col items-center gap-2 text-sm font-medium ${
+                  selected === index
+                    ? 'border-blue-900 bg-blue-50 text-blue-900'
+                    : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                }`}
+                onClick={() => { setSelected(index); setSelectedCategory(type); reduxCategory(type.heading); }}
+              >
+                <img src={type.categoryImage} alt={type.heading} className="w-12 h-12 object-contain" />
+                <span>{type.heading}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex justify-between mt-8">
+            <button
+              className="px-6 py-2.5 border border-gray-200 rounded-xl text-gray-700 font-semibold text-sm hover:bg-gray-50 transition-all"
+              onClick={() => navigate('/host/hostPlace')}
+            >
+              Back
+            </button>
+            <button
+              className="px-6 py-2.5 bg-blue-900 hover:bg-blue-800 text-white font-semibold rounded-xl text-sm transition-all shadow"
+              onClick={handleNextClick}
+            >
+              Next
+            </button>
           </div>
         </div>
-        
-        <div className="bg-black w-full mt-16 relative">
-          <div className="h-px w-30/100 bg-black"></div>
-          <div className="h-px w-70/100 bg-black"></div>
-        </div>
-        <div className="mt-12">
-        <button className="bg-gray-900 text-white px-4 py-2" onClick={()=>navigate("/host/hostPlace")}>
-            back
-          </button>
-          <button className="bg-gray-900 text-white ml-10 px-4 py-2" onClick={handleNextClick}>
-            Next
-          </button>
-        </div>
       </div>
-    </>
+    </div>
   );
 };
 

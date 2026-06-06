@@ -114,6 +114,14 @@ function App() {
           }
         />
         <Route
+          path="/userChat"
+          element={
+            <ProtectedRoute>
+              <Chat role={"user"} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/userChat/:hostId"
           element={
             <ProtectedRoute>

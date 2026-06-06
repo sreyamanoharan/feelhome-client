@@ -1,51 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../../api/axios';
-import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux';
-import { toast } from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom';
 
 const LatestProperties = () => {
-
   const [latestProperties, setLatestProperties] = useState([]);
-  const [minDate, setMinDate] = useState(new Date().toISOString().split('T')[0])
-  const [datas, setDatas] = useState([])
-  const [modalOpen, setModalOpen] = useState(false)
-  const [message, setMessage] = useState('')
-  const [loading, setLoading] = useState('')
-  const [checkInDate, setCheckInDate] = useState('');
-  const [checkOutDate, setCheckOutDate] = useState('');
-  const [numGuests, setNumGuests] = useState(1);
-  const [propertyId, setPropertyId] = useState('')
-  const [hostId, setHostId] = useState('')
-  const userId = useSelector(state => state.User.userId)
-  const [bookingSuccess, setBookingSuccess] = useState(false);
-  const [categoryFilter, setCategoryFilter] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
-
-
-
-  const handleBooking = async (propertyId) => {
-    console.log('hereee')
-    if (new Date() >= new Date(checkInDate) || checkInDate == checkOutDate || new Date() >= new Date(checkOutDate) || checkInDate == undefined || checkOutDate == undefined) {
-      console.log('booking.........')
-      toast.error("Enter correct dates")
-    } else {
-      console.log('booking.........')
-
-      axiosInstance.post('/create-checkout-session', { userId, propertyId, checkInDate, checkOutDate }).then((res) => {
-        if (res.data.url) {
-          window.location.href = res.data.url
-        }
-      }).catch((err) => {
-        console.log(err)
-        if (err?.response.data.errMsg) {
-          console.log('error')
-          toast.error(err.response.data.errMsg)
-        }
-      })
-    }
-  }
 
   useEffect(() => {
     const fetchLatestProperties = async () => {
@@ -59,42 +18,78 @@ const LatestProperties = () => {
         console.error('Error fetching latest properties:', error);
       }
     };
-
     fetchLatestProperties();
   }, []);
 
   return (
-    <>
-      <div className='h-full text-gray-900 bg-white '>
-        <div className="text-center">
-          <h1 className="text-gray-900 text-3xl p-5" style={{
-            fontFamily: ' "Oswald", serif',
-          }}>Latest Properties</h1>
-        </div>
+    <section className="py-16 bg-white">
+      {/* Section heading */}
+      <div className="text-center mb-10 px-6">
+        <span className="text-blue-600 text-xs font-semibold uppercase tracking-widest">
+          Freshly Listed
+        </span>
+        <h2
+          className="text-3xl md:text-4xl font-bold text-gray-900 mt-2"
+          style={{ fontFamily: '"Oswald", serif' }}
+        >
+          Latest Properties
+        </h2>
+      </div>
 
-        <div className='bg-white gap-3 w-full flex flex-wrap justify-center p-9'>
-
-          {latestProperties.map((data, index) => (
-            <div key={data._id} className="card w-72 sm:w-96 bg-white shadow-3xl mt-5 mx-2">
-            
-              <div className="card-body items-center text-center cursor-pointer" onClick={() => navigate(`/propertyDetails/${data._id}`)}>
-                <h2 className="card-title">
-                  <img src={data?.images[0]} alt="" />
-                </h2>
-                <p style={{ fontFamily: ' "Oswald", serif', }}>{data?.selectedCategory}</p>
-                <p style={{ fontFamily: ' "Oswald", serif', }}>{data?.selectedLocation}</p>
-                 <p style={{ fontFamily: ' "Oswald", serif', }}> Rs.{data?.selectedPrice}/day</p>
-
+      {/* Property grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-6 md:px-16">
+        {latestProperties.map((data, index) => (
+          <div
+            key={data._id}
+            className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer animate-fade-in-up"
+            style={{ animationDelay: `${index * 60}ms`, opacity: 0, animationFillMode: 'forwards' }}
+            onClick={() => navigate(`/propertyDetails/${data._id}`)}
+          >
+            {/* Image */}
+            <div className="relative w-full h-48 overflow-hidden">
+              <img
+                src={data?.images[0]}
+                alt={data?.selectedCategory}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              <div className="absolute top-3 right-3 bg-blue-900/90 text-white text-xs font-semibold px-3 py-1 rounded-full backdrop-blur-sm">
+                {data?.selectedCategory}
               </div>
             </div>
-          ))}
-        </div>
 
+            {/* Card body */}
+            <div className="p-4">
+              <p
+                className="text-gray-500 text-sm flex items-center gap-1 mb-1"
+                style={{ fontFamily: '"Oswald", serif' }}
+              >
+                <span className="text-blue-500">📍</span>
+                {data?.selectedLocation}
+              </p>
+              <p
+                className="text-lg font-bold text-gray-900"
+                style={{ fontFamily: '"Oswald", serif' }}
+              >
+                ₹{data?.selectedPrice}{' '}
+                <span className="text-gray-400 text-sm font-normal">/ day</span>
+              </p>
+            </div>
+          </div>
+        ))}
       </div>
-    </>
-  )
-}
 
+      {/* Explore all button */}
+      <div className="flex justify-center mt-12">
+        <button
+          onClick={() => navigate('/allProperties')}
+          className="border-2 border-blue-900 text-blue-900 font-semibold px-8 py-3 rounded-xl hover:bg-blue-900 hover:text-white transition-all duration-200 shadow-sm"
+          style={{ fontFamily: '"Oswald", serif' }}
+        >
+          Explore All Properties →
+        </button>
+      </div>
+    </section>
+  );
+};
 
-
-export default LatestProperties
+export default LatestProperties;
