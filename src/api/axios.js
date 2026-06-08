@@ -39,7 +39,7 @@ import { Store } from '../store/Store';
 import axios from "axios"
 
 // const baseURL = 'http://localhost:3000/'
-const baseURL = 'https://feelhome-server-production.up.railway.app'
+const baseURL = 'https://feelhome-backend.onrender.com'
 const axiosInstance = axios.create({
   baseURL: baseURL
 })
