@@ -9,7 +9,6 @@ const Banner = () => {
   const [banners, setBanners] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [progress, setProgress] = useState(0);
-  const [animating, setAnimating] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,29 +17,35 @@ const Banner = () => {
     }).catch(err => console.log(err));
   }, []);
 
-  useEffect(() => {
-    if (banners.length < 2) return;
-    setProgress(0);
-    const step = 100 / (SLIDE_DURATION / 50);
-    const interval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          goTo((activeIndex + 1) % banners.length);
-          return 0;
-        }
-        return prev + step;
-      });
-    }, 50);
-    return () => clearInterval(interval);
-  }, [activeIndex, banners]);
+useEffect(() => {
+  if (banners.length < 2) return;
 
-  const goTo = useCallback((index) => {
-    if (animating) return;
-    setAnimating(true);
-    setActiveIndex(index);
+  setProgress(0);
+
+  const progressInterval = setInterval(() => {
+    setProgress(prev => {
+      if (prev >= 100) return 0;
+      return prev + 1;
+    });
+  }, SLIDE_DURATION / 100);
+
+  const slideInterval = setInterval(() => {
+    setActiveIndex(prev =>
+      prev === banners.length - 1 ? 0 : prev + 1
+    );
     setProgress(0);
-    setTimeout(() => setAnimating(false), 500);
-  }, [animating]);
+  }, SLIDE_DURATION);
+
+  return () => {
+    clearInterval(progressInterval);
+    clearInterval(slideInterval);
+  };
+}, [banners.length]);
+
+ const goTo = (index) => {
+  setActiveIndex(index);
+  setProgress(0);
+};
 
   const prev = () => goTo((activeIndex - 1 + banners.length) % banners.length);
   const next = () => goTo((activeIndex + 1) % banners.length);
