@@ -73,7 +73,7 @@ const Banner = () => {
                 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-5 animate-fade-in-up"
                 style={{ fontFamily: '"Caveat", serif', opacity: 0, animationFillMode: 'forwards' }}
               >
-                {banner.mainHeading}
+                {banner?.mainHeading}
               </h2>
 
               <p
@@ -109,7 +109,7 @@ const Banner = () => {
             <div className="flex items-center justify-between mt-10">
               {/* Progress dots */}
               <div className="flex items-center gap-2">
-                {banners.map((_, i) => (
+                {banners?.map((_, i) => (
                   <button
                     key={i}
                     onClick={() => goTo(i)}
@@ -147,7 +147,7 @@ const Banner = () => {
 
           {/* ── RIGHT: Image carousel ── */}
           <div className="relative flex-1 min-h-[320px] lg:min-h-0 overflow-hidden">
-            {banners.map((b, i) => (
+            {banners?.map((b, i) => (
               <img
                 key={b._id}
                 src={b.bannerImage}
@@ -164,7 +164,7 @@ const Banner = () => {
             </div>
 
             {/* Thumbnail strip — bottom of image */}
-            {banners.length > 1 && (
+            {banners?.length > 1 && (
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2">
                 {banners.map((b, i) => (
                   <button

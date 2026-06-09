@@ -65,7 +65,7 @@ const HomeData = () => {
             All Properties
           </h1>
           <p className="text-gray-500 text-sm mt-1">
-            {filteredDatas.length} {filteredDatas.length === 1 ? 'property' : 'properties'} found
+            {filteredDatas?.length} {filteredDatas?.length === 1 ? 'property' : 'properties'} found
           </p>
         </div>
 
@@ -82,7 +82,7 @@ const HomeData = () => {
                 className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
               >
                 <option value="">All Categories</option>
-                {categories.map((cat) => (
+                {categories?.map((cat) => (
                   <option key={cat} value={cat}>{cat}</option>
                 ))}
               </select>
@@ -122,7 +122,7 @@ const HomeData = () => {
         {!loading && currentItems.length > 0 && (
           <div className="px-6 md:px-14">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {currentItems.map((data, index) => (
+              {currentItems?.map((data, index) => (
                 <div
                   key={data._id}
                   onClick={() => navigate(`/propertyDetails/${data._id}`)}
