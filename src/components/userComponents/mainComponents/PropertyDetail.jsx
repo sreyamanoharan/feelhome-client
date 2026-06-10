@@ -79,31 +79,57 @@ const PropertyDetail = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleAddReview = async () => {
-    if (!newReview || rating === 0) {
-      toast.error('Please add a review and select a rating!');
-      return;
-    }
+  // const handleAddReview = async () => {
+  //   if (!newReview || rating === 0) {
+  //     toast.error('Please add a review and select a rating!');
+  //     return;
+  //   }
 
-    try {
-      const res = await axiosInstance.post('/reviews', {
-        userId,
-        propertyId: id,
-        review: newReview,
-        rating,
-      });
+  //   try {
+  //     const res = await axiosInstance.post('/reviews', {
+  //       userId,
+  //       propertyId: id,
+  //       review: newReview,
+  //       rating,
+  //     });
 
-      setReviews((prev) => [...prev, res.data.review]);
-      setNewReview('');
-      setRating(0);
-      toast.success('Review added successfully!');
-    } catch (err) {
-      console.error(err);
-      toast.error('Failed to add review!');
-    }
-  };
+  //     setReviews((prev) => [...prev, res.data.review]);
+  //     setNewReview('');
+  //     setRating(0);
+  //     toast.success('Review added successfully!');
+  //   } catch (err) {
+  //     console.error(err);
+  //     toast.error('Failed to add review!');
+  //   }
+  // };
 
+const handleAddReview = async () => {
+  if (!newReview || rating === 0) {
+    toast.error('Please add a review and select a rating!');
+    return;
+  }
 
+  try {
+    const res = await axiosInstance.post('/reviews', {
+      userId,
+      propertyId: id,
+      review: newReview,
+      rating,
+    });
+
+    // Refetch reviews to get fully populated data
+    const updatedReviews = await axiosInstance.get(`/reviews/${id}`);
+    setReviews(updatedReviews.data.review);
+    setRatings(updatedReviews.data.rating);
+    
+    setNewReview('');
+    setRating(0);
+    toast.success('Review added successfully!');
+  } catch (err) {
+    console.error(err);
+    toast.error('Failed to add review!');
+  }
+};
 
 
   const calculateDays = () => {
@@ -357,9 +383,11 @@ const PropertyDetail = () => {
                   <div className="absolute top-full left-0 mt-2 z-50 shadow-2xl rounded-xl border border-gray-200 bg-white">
                     <Calendar
                       onChange={(date) => {
-                        setCheckInDate(date.toISOString().split('T')[0]);
-                        setShowCheckInCal(false);
-                      }}
+  const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+    .toISOString().split('T')[0];
+  setCheckInDate(localDate);
+  setShowCheckInCal(false);
+}}
                       value={checkInDate ? new Date(checkInDate) : null}
                       minDate={new Date()}
                       className="rounded-xl"
@@ -383,10 +411,12 @@ const PropertyDetail = () => {
                 {showCheckOutCal && (
                   <div className="absolute top-full left-0 mt-2 z-50 shadow-2xl rounded-xl border border-gray-200 bg-white">
                     <Calendar
-                      onChange={(date) => {
-                        setCheckOutDate(date.toISOString().split('T')[0]);
-                        setShowCheckOutCal(false);
-                      }}
+                     onChange={(date) => {
+  const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+    .toISOString().split('T')[0];
+  setCheckOutDate(localDate);
+  setShowCheckOutCal(false);
+}}
                       value={checkOutDate ? new Date(checkOutDate) : null}
                       minDate={checkInDate ? new Date(checkInDate) : new Date()}
                       className="rounded-xl"
