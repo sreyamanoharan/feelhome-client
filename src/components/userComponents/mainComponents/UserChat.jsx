@@ -33,35 +33,66 @@ console.log(hostId,'hooossstttIiiidddd');
     };
   }, []);
 
-  useEffect(()=>{
-    axiosInstance.post('/chat/create-chat',{userId,hostId})
-  },[])
-
   useEffect(() => {
-    socket.emit('setup', userId);
-    socket.emit('join chat',userId)
-  }, [messages, userId]);
+    const initializeChat = async () => {
+      if (!userId) return;
 
-  useEffect(() => {
-    const fetch = async () => {
-      allChats(userId).then((data) => {
+      try {
+        let activeChat = null;
+
+        if (hostId) {
+          const res = await axiosInstance.post('/chat/create-chat', { userId, hostId });
+          if (res.data && res.data.chat) {
+            const rawChat = res.data.chat;
+            const filteredUsers = rawChat.User.filter((item) => item._id !== userId);
+            activeChat = {
+              ...rawChat,
+              User: filteredUsers,
+            };
+          }
+        }
+
+        const data = await allChats(userId);
         let lists = data?.map((obj) => {
           let filteredUsers = obj.User.filter((item) => item._id !== userId);
           return {
             ...obj,
             User: filteredUsers,
           };
-        });
-        setChats(lists);
-        if (lists.length > 0) {
-          // Select the first chat and fetch its messages
-          selectChat(lists[0]);
-          handleMessageFetch(lists[0]._id);
+        }) || [];
+
+        if (activeChat) {
+          const existingChatIndex = lists.findIndex((chat) => chat._id === activeChat._id);
+          if (existingChatIndex !== -1) {
+            const [target] = lists.splice(existingChatIndex, 1);
+            lists.unshift(target);
+          } else {
+            lists.unshift(activeChat);
+          }
         }
-      });
+
+        setChats(lists);
+
+        if (lists.length > 0) {
+          const chatToSelect = activeChat 
+            ? lists.find((c) => c._id === activeChat._id) || lists[0]
+            : lists[0];
+          
+          selectChat(chatToSelect);
+          handleMessageFetch(chatToSelect._id);
+        }
+      } catch (error) {
+        console.error('Error initializing chat:', error);
+      }
     };
-    fetch();
-  }, [userId]);
+
+    initializeChat();
+  }, [userId, hostId]);
+
+  useEffect(() => {
+    socket.emit('setup', userId);
+    socket.emit('join chat', userId);
+  }, [messages, userId]);
 
   useEffect(() => {
     axiosInstance.get(`/getUser/${userId}`).then((res) => {
