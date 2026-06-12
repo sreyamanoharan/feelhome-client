@@ -29,6 +29,7 @@ const Navbar = () => {
     { to: "/host/hostHome", label: "Host your Home" },
     { to: "/bookings",      label: "My Bookings" },
     { to: "/allProperties", label: "All Properties" },
+    { to: "/userChat",      label: "Chat" },
   ];
 
   return (
