@@ -234,51 +234,56 @@ const handleAddReview = async () => {
           {/* Image Modal */}
           {selectedImageIndex !== null && (
             <div
-              className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 animate-fade-in"
+              className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 animate-fade-in"
               onClick={() => setSelectedImageIndex(null)}
             >
-              <div className="relative max-w-5xl w-full mx-4 animate-scale-up" onClick={(e) => e.stopPropagation()}>
-                {/* Close Button */}
+              <div 
+                className="relative bg-white rounded-2xl shadow-2xl p-8 flex flex-col justify-between items-center w-[90%] max-w-4xl h-[600px] animate-scale-up" 
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Close Button on White Background in Blue */}
                 <button
-                  className="absolute -top-12 right-0 text-4xl text-white hover:text-blue-300 transition-colors duration-200"
+                  className="absolute top-4 right-4 text-3xl font-bold text-blue-600 hover:text-blue-800 transition-colors duration-200 hover:scale-110 active:scale-95 z-20"
                   onClick={() => setSelectedImageIndex(null)}
                 >
                   &times;
                 </button>
 
-                {/* Image Number */}
-                <div className="absolute top-4 left-4 text-white text-sm font-semibold z-10 bg-black/60 px-3 py-1.5 rounded-full backdrop-blur-sm">
+                {/* Image Number in Blue */}
+                <div className="absolute top-4 left-4 text-blue-600 text-sm font-semibold z-10 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100 shadow-sm">
                   {selectedImageIndex + 1} / {datas.images.length}
                 </div>
 
-                {/* Image Slider */}
-                <div className="flex items-center justify-between bg-black/40 backdrop-blur-md rounded-2xl p-4 h-[600px] relative">
-                  <button
-                    className={`absolute left-4 z-10 text-white bg-black/40 hover:bg-black/75 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${
-                      selectedImageIndex === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:scale-105'
-                    }`}
-                    disabled={selectedImageIndex === 0}
-                    onClick={handlePreviousImage}
-                  >
-                    &#10094;
-                  </button>
-                  <div className="w-full h-full flex items-center justify-center overflow-hidden rounded-lg">
-                    <img
-                      src={datas.images[selectedImageIndex]}
-                      alt={`Selected ${selectedImageIndex + 1}`}
-                      className="max-h-full max-w-full object-contain rounded shadow-2xl transition-transform duration-300"
-                    />
-                  </div>
-                  <button
-                    className={`absolute right-4 z-10 text-white bg-black/40 hover:bg-black/75 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${
-                      selectedImageIndex === datas.images.length - 1 ? 'opacity-30 cursor-not-allowed' : 'hover:scale-105'
-                    }`}
-                    disabled={selectedImageIndex === datas.images.length - 1}
-                    onClick={handleNextImage}
-                  >
-                    &#10095;
-                  </button>
+                {/* Left Button in Blue */}
+                <button
+                  className={`absolute left-4 top-1/2 -translate-y-1/2 z-10 text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 shadow-md ${
+                    selectedImageIndex === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:scale-105 active:scale-95'
+                  }`}
+                  disabled={selectedImageIndex === 0}
+                  onClick={handlePreviousImage}
+                >
+                  &#10094;
+                </button>
+
+                {/* Image Display */}
+                <div className="w-full flex-1 flex items-center justify-center overflow-hidden rounded-xl bg-gray-50 border border-gray-100 mt-6">
+                  <img
+                    src={datas.images[selectedImageIndex]}
+                    alt={`Selected ${selectedImageIndex + 1}`}
+                    className="max-h-[420px] max-w-full object-contain rounded-lg transition-transform duration-300"
+                  />
                 </div>
+
+                {/* Right Button in Blue */}
+                <button
+                  className={`absolute right-4 top-1/2 -translate-y-1/2 z-10 text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 shadow-md ${
+                    selectedImageIndex === datas.images.length - 1 ? 'opacity-30 cursor-not-allowed' : 'hover:scale-105 active:scale-95'
+                  }`}
+                  disabled={selectedImageIndex === datas.images.length - 1}
+                  onClick={handleNextImage}
+                >
+                  &#10095;
+                </button>
               </div>
             </div>
           )}
