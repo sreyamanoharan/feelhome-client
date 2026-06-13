@@ -231,7 +231,7 @@ console.log(hostId,'hooossstttIiiidddd');
                     alt="username"
                   />
                 </div>
-                <span className="font-semibold text-white text-base">
+                <span className="font-semibold text-black text-base">
                   {selectedUser?.User[0]?._id === userId
                     ? selectedUser?.User[1]?.name
                     : selectedUser?.User[0]?.name}
