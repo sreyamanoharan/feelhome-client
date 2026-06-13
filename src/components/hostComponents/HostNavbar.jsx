@@ -13,9 +13,9 @@ const HostNavbar = () => {
   const isActive = (path) => location.pathname === path
 
   const navLinks = [
-    { label: 'Home',           path: '/host/hostHome', icon: <FiHome /> },
-    { label: 'My Properties',  path: '/host/hostProps', icon: <FiGrid /> },
-    { label: 'Chat',           path: '/host/chat',      icon: <FiMessageSquare /> },
+    { label: 'Host-Home', path: '/host/hostHome', icon: <FiHome /> },
+    { label: 'My Properties', path: '/host/hostProps', icon: <FiGrid /> },
+    { label: 'Chat', path: '/host/chat', icon: <FiMessageSquare /> },
   ]
 
   return (
