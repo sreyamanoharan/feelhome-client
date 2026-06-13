@@ -23,8 +23,8 @@ function User_Detail({ setEdit }) {
   }, []);
 
   const fields = [
-    { icon: <FiUser className="text-blue-500" />,  label: 'Full Name', value: user.name },
-    { icon: <FiMail className="text-blue-500" />,  label: 'Email Address', value: user.email },
+    { icon: <FiUser className="text-blue-500" />, label: 'Full Name', value: user.name },
+    { icon: <FiMail className="text-blue-500" />, label: 'Email Address', value: user.email },
     { icon: <FiPhone className="text-blue-500" />, label: 'Phone Number', value: user.PhoneNumber },
   ];
 

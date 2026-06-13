@@ -34,24 +34,25 @@ console.log(hostId,'hooossstttIiiidddd');
   }, []);
 
   useEffect(() => {
-    const initializeChat = async () => {
-      if (!userId) return;
+    socket.emit('setup', userId);
+    socket.emit('join chat', userId);
+  }, [messages, userId]);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const initChat = async () => {
+      try {
+        if (hostId) {
+          // Ensure the chat is created/retrieved first
+          await axiosInstance.post('/chat/create-chat', { userId, hostId });
+        }
+      } catch (error) {
+        console.error("Error creating/retrieving chat:", error);
+      }
 
       try {
-        let activeChat = null;
-
-        if (hostId) {
-          const res = await axiosInstance.post('/chat/create-chat', { userId, hostId });
-          if (res.data && res.data.chat) {
-            const rawChat = res.data.chat;
-            const filteredUsers = rawChat.User.filter((item) => item._id !== userId);
-            activeChat = {
-              ...rawChat,
-              User: filteredUsers,
-            };
-          }
-        }
-
+        // Fetch all chats
         const data = await allChats(userId);
         let lists = data?.map((obj) => {
           let filteredUsers = obj.User.filter((item) => item._id !== userId);
@@ -61,44 +62,41 @@ console.log(hostId,'hooossstttIiiidddd');
           };
         }) || [];
 
-        if (activeChat) {
-          const existingChatIndex = lists.findIndex((chat) => chat._id === activeChat._id);
-          if (existingChatIndex !== -1) {
-            const [target] = lists.splice(existingChatIndex, 1);
-            lists.unshift(target);
-          } else {
-            lists.unshift(activeChat);
+        let selected = null;
+        if (hostId) {
+          const targetIndex = lists.findIndex((obj) => obj.User[0]?._id === hostId);
+          if (targetIndex !== -1) {
+            selected = lists[targetIndex];
+            // Remove from list and unshift to top
+            lists.splice(targetIndex, 1);
+            lists.unshift(selected);
           }
         }
 
         setChats(lists);
 
-        if (lists.length > 0) {
-          const chatToSelect = activeChat 
-            ? lists.find((c) => c._id === activeChat._id) || lists[0]
-            : lists[0];
-          
-          selectChat(chatToSelect);
-          handleMessageFetch(chatToSelect._id);
+        if (selected) {
+          selectChat(selected);
+          handleMessageFetch(selected._id);
+        } else if (lists.length > 0) {
+          selectChat(lists[0]);
+          handleMessageFetch(lists[0]._id);
         }
       } catch (error) {
-        console.error('Error initializing chat:', error);
+        console.error("Error fetching chat list:", error);
       }
     };
 
-    initializeChat();
+    initChat();
   }, [userId, hostId]);
 
   useEffect(() => {
-    socket.emit('setup', userId);
-    socket.emit('join chat', userId);
-  }, [messages, userId]);
-
-  useEffect(() => {
-    axiosInstance.get(`/getUser/${userId}`).then((res) => {
-      setDetails(res.data.users);
-    });
-  }, []);
+    if (userId) {
+      axiosInstance.get(`/getUser/${userId}`).then((res) => {
+        setDetails(res.data.users);
+      });
+    }
+  }, [userId]);
 
   const selectChat = (user) => {
     setselectedUser(user);
@@ -233,7 +231,7 @@ console.log(hostId,'hooossstttIiiidddd');
                     alt="username"
                   />
                 </div>
-                <span className="font-semibold text-gray-900 text-base">
+                <span className="font-semibold text-white text-base">
                   {selectedUser?.User[0]?._id === userId
                     ? selectedUser?.User[1]?.name
                     : selectedUser?.User[0]?.name}
