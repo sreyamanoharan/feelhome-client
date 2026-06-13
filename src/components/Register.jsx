@@ -36,7 +36,7 @@ const Register = () => {
         console.log(res, 'ressss');
 
         if (res.data.message) {
-          toast.success(res.data.message, { duration: Infinity });
+          toast.success(res.data.message, { duration: 60000 });
           clearForm()
         }
       }).catch((err) => {
